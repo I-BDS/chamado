@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>Comanda — Sistema de Pedidos</title>
+<!-- Ícone para PWA (caixa postal) -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230d1f3c'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='%23ffffff' font-family='Arial'%3E📬%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230d1f3c'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='%23ffffff' font-family='Arial'%3E📬%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Comanda%22%2C%22short_name%22%3A%22Comanda%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230d1f3c%22%2C%22theme_color%22%3A%22%230d1f3c%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data:image/svg+xml,%253Csvg%2520xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%2520viewBox%3D%270%200%20100%20100%27%253E%253Crect%2520width%3D%27100%27%2520height%3D%27100%27%2520rx%3D%2720%27%2520fill%3D%27%25230d1f3c%27%2F%253E%253Ctext%2520x%3D%2750%27%2520y%3D%2770%27%2520font-size%3D%2760%27%2520text-anchor%3D%27middle%27%2520fill%3D%27%2523ffffff%27%2520font-family%3D%27Arial%27%253E%1F4EC%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===== ESTILOS COMPLETOS (MANTIDOS) ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy: #0d1f3c;
+  --navy-mid: #162d56;
+  --blue: #2563eb;
+  --white: #ffffff;
+  --bg: #f4f6fa;
+  --bg2: #edf0f7;
+  --border: #d1d9e6;
+  --text: #0d1f3c;
+  --text2: #4a5568;
+  --text3: #8fa3bf;
+  --ok: #16a34a; --ok-bg: #dcfce7;
+  --warn: #d97706; --warn-bg: #fef9ec;
+  --danger: #dc2626; --danger-bg: #fee2e2;
+  --shadow-lg: 0 8px 32px rgba(13,31,60,0.14);
+  --radius: 10px;
+  --font: 'DM Sans', sans-serif;
+}
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-size: 15px;
+}
+.hidden { display: none !important; }
+
+/* ════ LOGIN ════ */
+#login-screen { position: fixed; inset: 0; background: var(--white); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.login-card { width: 100%; max-width: 400px; background: var(--white); border-radius: 16px; box-shadow: var(--shadow-lg); overflow: hidden; }
+.login-header { background: var(--navy); padding: 36px 40px 28px; text-align: center; }
+.login-logo-mark { width: 48px; height: 48px; background: rgba(255,255,255,0.12); border: 2px solid rgba(255,255,255,0.2); border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px; font-size: 1.4rem; }
+.login-title { font-size: 1.5rem; font-weight: 700; color: #fff; letter-spacing: -0.02em; }
+.login-sub { font-size: 0.82rem; color: rgba(255,255,255,0.5); margin-top: 4px; }
+.login-body { padding: 32px 40px 36px; }
+.login-label { display: block; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text2); margin-bottom: 8px; }
+.login-input { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 8px; font-family: var(--font); font-size: 1rem; color: var(--text); background: var(--bg); outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+.login-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); background: #fff; }
+.login-error { font-size: 0.8rem; color: var(--danger); margin-top: 8px; min-height: 18px; }
+.btn-login { width: 100%; margin-top: 20px; padding: 13px; background: var(--navy); color: #fff; border: none; border-radius: 8px; font-family: var(--font); font-size: 0.92rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.btn-login:hover { background: var(--navy-mid); }
+
+/* ════ APP ════ */
+#app { display: flex; flex-direction: column; min-height: 100vh; }
+.topbar { background: var(--navy); height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; flex-shrink: 0; position: sticky; top: 0; z-index: 50; }
+.topbar-brand { display: flex; align-items: center; gap: 12px; }
+.brand-icon { width: 32px; height: 32px; background: rgba(255,255,255,0.12); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+.brand-name { font-size: 1.05rem; font-weight: 700; color: #fff; }
+.topbar-right { display: flex; align-items: center; gap: 14px; }
+.user-chip { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); border-radius: 20px; padding: 5px 12px 5px 8px; }
+.user-avatar { width: 24px; height: 24px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; color: #fff; }
+.user-name { font-size: 0.8rem; font-weight: 500; color: rgba(255,255,255,0.85); }
+.user-role { font-size: 0.7rem; color: rgba(255,255,255,0.45); }
+.btn-logout { background: none; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); font-family: var(--font); font-size: 0.78rem; padding: 5px 12px; border-radius: 6px; cursor: pointer; transition: all 0.15s; }
+.btn-logout:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+.topbar-clock { font-size: 0.8rem; color: rgba(255,255,255,0.4); font-variant-numeric: tabular-nums; }
+
+/* NAV */
+.nav { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 28px; display: flex; gap: 2px; flex-shrink: 0; }
+.nav-btn { display: flex; align-items: center; gap: 7px; padding: 14px 18px; border: none; background: none; font-family: var(--font); font-size: 0.85rem; font-weight: 500; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; position: relative; top: 1px; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
+.nav-btn:hover { color: var(--text2); }
+.nav-btn.active { color: var(--navy); border-bottom-color: var(--navy); font-weight: 600; }
+.nav-btn.locked { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+.nav-badge { background: var(--navy); color: #fff; font-size: 0.62rem; font-weight: 700; border-radius: 10px; padding: 1px 6px; min-width: 18px; text-align: center; }
+
+/* MAIN */
+.main-area { flex: 1; padding: 28px; max-width: 1100px; width: 100%; margin: 0 auto; overflow-y: auto; }
+.panel { display: none; }
+.panel.active { display: flex; flex-direction: column; }
+
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; flex-wrap: wrap; gap: 12px; flex-shrink: 0; }
+.page-title { font-size: 1.25rem; font-weight: 700; color: var(--navy); letter-spacing: -0.02em; }
+.page-subtitle { font-size: 0.82rem; color: var(--text3); margin-top: 2px; }
+
+/* ════ ORDERS ════ */
+.filter-pills { display: flex; gap: 6px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 4px; }
+.pill { padding: 5px 14px; border-radius: 5px; border: none; background: none; font-family: var(--font); font-size: 0.78rem; font-weight: 500; color: var(--text2); cursor: pointer; transition: all 0.15s; }
+.pill.active { background: var(--navy); color: #fff; }
+.pill:hover:not(.active) { background: var(--bg2); }
+
+.orders-scroll { flex: 1; overflow-y: auto; padding-right: 4px; max-height: 400px; }
+.orders-scroll::-webkit-scrollbar { width: 5px; }
+.orders-scroll::-webkit-scrollbar-track { background: transparent; }
+.orders-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+.orders-list { display: flex; flex-direction: column; gap: 10px; padding-bottom: 8px; }
+
+.order-card { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px 18px; display: grid; grid-template-columns: 52px 1fr auto; gap: 14px; align-items: start; transition: border-color 0.3s, box-shadow 0.3s; animation: fadeSlide 0.25s ease forwards; }
+@keyframes fadeSlide { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
+
+.order-card.status-warn { border-color: var(--warn); animation: fadeSlide 0.25s ease forwards, glow-warn 2s ease-in-out infinite; }
+.order-card.status-danger { border-color: var(--danger); animation: fadeSlide 0.25s ease forwards, glow-danger 1.4s ease-in-out infinite; }
+.order-card.status-done { opacity: 0.5; animation: none; }
+@keyframes glow-warn { 0%,100%{box-shadow:none;} 50%{box-shadow:0 0 0 3px rgba(217,119,6,0.15),0 4px 16px rgba(217,119,6,0.1);} }
+@keyframes glow-danger { 0%,100%{box-shadow:none;} 50%{box-shadow:0 0 0 3px rgba(220,38,38,0.18),0 4px 16px rgba(220,38,38,0.12);} }
+
+.order-id-block { display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg); border-radius: 8px; height: 52px; font-weight: 700; font-size: 1.05rem; color: var(--navy); }
+.order-id-block small { font-size: 0.58rem; font-weight: 500; color: var(--text3); text-transform: uppercase; }
+.order-card.status-warn .order-id-block { background: var(--warn-bg); color: var(--warn); }
+.order-card.status-danger .order-id-block { background: var(--danger-bg); color: var(--danger); }
+.order-card.status-done .order-id-block { background: var(--ok-bg); color: var(--ok); }
+
+.order-body { min-width: 0; }
+.order-product { font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; }
+.order-addr { font-size: 0.77rem; color: var(--text2); display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 3px; }
+.addr-seg { display: flex; align-items: center; gap: 3px; }
+.addr-key { color: var(--text3); font-size: 0.7rem; }
+.order-meta-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+.order-req { font-size: 0.75rem; color: var(--text3); }
+.setor-chip { font-size: 0.68rem; font-weight: 600; background: #eff6ff; color: var(--blue); border-radius: 20px; padding: 1px 7px; }
+
+.order-side { display: flex; flex-direction: column; align-items: flex-end; gap: 7px; flex-shrink: 0; padding-top: 2px; }
+.order-time { font-size: 0.72rem; color: var(--text3); font-variant-numeric: tabular-nums; }
+.time-badge { font-size: 0.73rem; font-weight: 600; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+.time-badge.ok { background: var(--ok-bg); color: var(--ok); }
+.time-badge.warn { background: var(--warn-bg); color: var(--warn); }
+.time-badge.danger { background: var(--danger-bg); color: var(--danger); }
+.time-badge.done-badge { background: var(--bg2); color: var(--text3); }
+
+/* Complete row */
+.complete-row { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.code-input-small { width: 72px; padding: 6px 8px; border: 1.5px solid var(--border); border-radius: 6px; font-family: var(--font); font-size: 0.85rem; font-weight: 700; color: var(--text); text-align: center; letter-spacing: 0.1em; outline: none; background: var(--bg); transition: border-color 0.15s; }
+.code-input-small:focus { border-color: var(--blue); background: #fff; }
+.code-input-small::placeholder { color: var(--text3); font-weight: 400; letter-spacing: 0; font-size: 0.72rem; }
+.btn-complete { padding: 6px 12px; background: var(--navy); color: #fff; border: none; border-radius: 6px; font-family: var(--font); font-size: 0.73rem; font-weight: 600; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+.btn-complete:hover { background: var(--navy-mid); }
+.code-err { font-size: 0.68rem; color: var(--danger); margin-top: 3px; }
+
+/* ADM buttons */
+.adm-actions { display: flex; gap: 5px; margin-top: 7px; flex-wrap: wrap; }
+.btn-adm { padding: 4px 10px; border: 1px solid var(--border); border-radius: 5px; font-family: var(--font); font-size: 0.7rem; font-weight: 600; cursor: pointer; background: none; transition: all 0.15s; }
+.btn-adm.finish { color: var(--ok); border-color: var(--ok-bg); }
+.btn-adm.finish:hover { background: var(--ok-bg); }
+.btn-adm.remove { color: var(--danger); border-color: var(--danger-bg); }
+.btn-adm.remove:hover { background: var(--danger-bg); }
+
+.empty-state { text-align: center; padding: 64px 24px; color: var(--text3); flex-shrink: 0; }
+.empty-icon { font-size: 2.5rem; opacity: 0.3; margin-bottom: 12px; }
+.empty-label { font-size: 0.9rem; font-weight: 500; }
+
+/* ════ NOVO PEDIDO ════ */
+.sub-tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 22px; background: var(--white); border-radius: var(--radius) var(--radius) 0 0; padding: 0 6px; flex-shrink: 0; }
+.sub-tab-btn { padding: 12px 18px; border: none; background: none; font-family: var(--font); font-size: 0.83rem; font-weight: 500; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; position: relative; top: 1px; transition: color 0.15s, border-color 0.15s; display: flex; align-items: center; gap: 6px; }
+.sub-tab-btn.active { color: var(--navy); border-bottom-color: var(--navy); font-weight: 600; }
+.sub-tab-btn:hover:not(.active) { color: var(--text2); }
+.sub-panel { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+.sub-panel.active { display: flex; }
+
+.form-scroll { overflow-y: auto; flex: 1; padding-right: 4px; }
+.form-scroll::-webkit-scrollbar { width: 5px; }
+.form-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+.form-wrap { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; max-width: 680px; }
+.form-section-title { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.form-row { display: grid; grid-template-columns: repeat(var(--cols, 1), 1fr); gap: 12px; margin-bottom: 12px; }
+.form-field { display: flex; flex-direction: column; gap: 5px; }
+.f-label { font-size: 0.75rem; font-weight: 600; color: var(--text2); }
+.f-input { padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 7px; font-family: var(--font); font-size: 0.92rem; color: var(--text); background: var(--bg); outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+.f-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); background: #fff; }
+.f-input::placeholder { color: var(--text3); }
+textarea.f-input { resize: vertical; min-height: 78px; }
+.form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border); }
+.btn-secondary { padding: 10px 22px; background: none; border: 1.5px solid var(--border); border-radius: 7px; font-family: var(--font); font-size: 0.85rem; font-weight: 500; color: var(--text2); cursor: pointer; transition: all 0.15s; }
+.btn-secondary:hover { border-color: var(--text2); color: var(--text); }
+.btn-primary { padding: 10px 26px; background: var(--navy); border: none; border-radius: 7px; font-family: var(--font); font-size: 0.85rem; font-weight: 600; color: #fff; cursor: pointer; transition: background 0.15s; }
+.btn-primary:hover { background: var(--navy-mid); }
+
+/* MY ORDERS */
+.my-orders-scroll { flex: 1; overflow-y: auto; padding-right: 4px; }
+.my-orders-scroll::-webkit-scrollbar { width: 5px; }
+.my-orders-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+.my-orders-list { display: flex; flex-direction: column; gap: 10px; padding-bottom: 8px; }
+.my-order-card { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 16px; animation: fadeSlide 0.25s ease forwards; }
+.my-order-left { flex: 1; min-width: 0; }
+.my-order-product { font-weight: 600; font-size: 0.93rem; margin-bottom: 2px; }
+.my-order-addr { font-size: 0.77rem; color: var(--text3); }
+.my-order-time { font-size: 0.73rem; color: var(--text3); margin-top: 2px; }
+.my-order-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+.call-code-box { background: var(--navy); color: #fff; border-radius: 8px; padding: 7px 14px; text-align: center; }
+.call-code-label { font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.55; margin-bottom: 1px; }
+.call-code-val { font-size: 1.2rem; font-weight: 800; letter-spacing: 0.18em; font-variant-numeric: tabular-nums; }
+.my-order-status { font-size: 0.72rem; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
+.my-order-status.pending { background: var(--warn-bg); color: var(--warn); }
+.my-order-status.concluido { background: var(--ok-bg); color: var(--ok); }
+
+/* ════ CADASTRO ════ */
+.collab-layout { display: grid; grid-template-columns: 1fr 1.3fr; gap: 24px; align-items: start; }
+.card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.card-header { background: var(--navy); padding: 18px 22px; color: #fff; }
+.card-title { font-size: 0.95rem; font-weight: 700; }
+.card-sub { font-size: 0.78rem; color: rgba(255,255,255,0.5); margin-top: 2px; }
+.card-body { padding: 22px; }
+
+.role-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.role-option { border: 1.5px solid var(--border); border-radius: 8px; padding: 12px; cursor: pointer; transition: all 0.15s; text-align: center; user-select: none; }
+.role-option:hover { border-color: #93c5fd; }
+.role-option.selected { border-color: var(--navy); background: #f0f4ff; }
+.role-icon { font-size: 1.3rem; margin-bottom: 4px; }
+.role-name { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+.role-desc { font-size: 0.68rem; color: var(--text3); margin-top: 2px; }
+
+.collabs-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+.collabs-table th { text-align: left; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text3); padding: 0 12px 10px; }
+.collabs-table td { padding: 9px 12px; border-top: 1px solid var(--border); color: var(--text2); vertical-align: middle; }
+.collabs-table tr:hover td { background: var(--bg); }
+
+.role-chip { display: inline-block; font-size: 0.68rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+.role-chip.solicitante { background: #eff6ff; color: #2563eb; }
+.role-chip.operador { background: #f0fdf4; color: #16a34a; }
+.role-chip.adm { background: var(--navy); color: #fff; }
+
+.tbl-actions { display: flex; gap: 5px; justify-content: flex-end; }
+.btn-tbl { background: none; border: 1px solid var(--border); color: var(--text3); font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; cursor: pointer; transition: all 0.15s; font-family: var(--font); font-weight: 500; }
+.btn-tbl.edit:hover { border-color: var(--blue); color: var(--blue); }
+.btn-tbl.del:hover { border-color: var(--danger); color: var(--danger); }
+
+/* ════ MODAIS ════ */
+.modal-overlay { position: fixed; inset: 0; background: rgba(13,31,60,0.4); z-index: 500; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+.modal-box { background: var(--white); border-radius: 14px; padding: 30px; width: 100%; max-width: 360px; box-shadow: var(--shadow-lg); text-align: center; }
+.modal-icon { font-size: 2.2rem; margin-bottom: 10px; }
+.modal-title { font-size: 1.15rem; font-weight: 700; color: var(--navy); margin-bottom: 5px; }
+.modal-sub { font-size: 0.84rem; color: var(--text2); margin-bottom: 18px; }
+.code-display { font-size: 2.8rem; font-weight: 800; letter-spacing: 0.22em; color: var(--navy); background: var(--bg); border-radius: 10px; padding: 16px; margin-bottom: 14px; font-variant-numeric: tabular-nums; }
+.modal-note { font-size: 0.76rem; color: var(--text3); margin-bottom: 18px; }
+
+/* Edit collab modal */
+.edit-modal-box { background: var(--white); border-radius: 14px; padding: 28px; width: 100%; max-width: 400px; box-shadow: var(--shadow-lg); }
+.edit-modal-title { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 18px; }
+.edit-modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+
+/* ════ TOAST ════ */
+.toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+.toast { background: var(--navy); color: #fff; font-size: 0.84rem; font-weight: 500; padding: 11px 18px; border-radius: 8px; box-shadow: var(--shadow-lg); pointer-events: none; transform: translateX(110%); opacity: 0; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); max-width: 320px; display: flex; align-items: center; gap: 8px; }
+.toast.show { transform: translateX(0); opacity: 1; }
+.toast.tsuccess { background: var(--ok); }
+.toast.terror { background: var(--danger); }
+.toast.twarn { background: var(--warn); }
+.toast-icon { font-size: 1rem; flex-shrink: 0; }
+
+/* STATUS BAR */
+.statusbar { background: var(--white); border-top: 1px solid var(--border); padding: 7px 28px; display: flex; align-items: center; gap: 22px; flex-shrink: 0; }
+.sb-item { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: var(--text3); }
+.sb-dot { width: 7px; height: 7px; border-radius: 50%; }
+.sb-dot.ok { background: var(--ok); }
+.sb-dot.warn { background: var(--warn); }
+.sb-dot.danger { background: var(--danger); }
+
+/* Notification permission banner */
+.notif-banner { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 10px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 0.82rem; color: #92400e; flex-shrink: 0; }
+.btn-allow-notif { padding: 5px 12px; background: var(--warn); color: #fff; border: none; border-radius: 5px; font-family: var(--font); font-size: 0.75rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+
+/* Ranking */
+.ranking-section {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-top: 24px;
+}
+.ranking-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ranking-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.ranking-item {
+  background: var(--bg);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ranking-count {
+  background: var(--navy);
+  color: white;
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 700px) {
+  .main-area { padding: 14px; }
+  .topbar, .nav, .statusbar { padding: 0 14px; }
+  .collab-layout { grid-template-columns: 1fr; }
+  .order-card { grid-template-columns: 44px 1fr; }
+  .order-side { display: none; }
+  .form-wrap { padding: 16px; }
+  .statusbar { gap: 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-logo-mark">📋</div>
+      <div class="login-title">Comanda</div>
+      <div class="login-sub">Sistema de Gestão de Pedidos</div>
+    </div>
+    <div class="login-body">
+      <label class="login-label" for="login-user">Usuário (username)</label>
+      <input class="login-input" id="login-user" type="text" placeholder="Digite seu usuário" autocomplete="off">
+      <div class="login-error" id="login-error"></div>
+      <button class="btn-login" id="btn-login">Entrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app" class="hidden">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="brand-icon">📋</div>
+      <span class="brand-name">Comanda</span>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-clock" id="app-clock"></div>
+      <div class="user-chip">
+        <div class="user-avatar" id="u-avatar">?</div>
+        <div>
+          <div class="user-name" id="u-name"></div>
+          <div class="user-role" id="u-role"></div>
+        </div>
+      </div>
+      <button class="btn-logout" id="btn-logout">Sair</button>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn" id="nav-orders" onclick="switchTab('orders')">
+      Solicitações <span class="nav-badge" id="badge-orders">0</span>
+    </button>
+    <button class="nav-btn" id="nav-new" onclick="switchTab('new')">Novo Pedido</button>
+    <button class="nav-btn" id="nav-cadastro" onclick="switchTab('cadastro')">Colaboradores</button>
+  </div>
+
+  <div class="main-area">
+
+    <!-- SOLICITAÇÕES -->
+    <div class="panel" id="panel-orders">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Solicitações</div>
+          <div class="page-subtitle">Mais antigos no topo · insira o código para concluir</div>
+        </div>
+        <div class="filter-pills">
+          <button class="pill active" onclick="setFilter('all',this)">Todos</button>
+          <button class="pill" onclick="setFilter('pending',this)">Pendentes</button>
+          <button class="pill" onclick="setFilter('done',this)">Concluídos</button>
+        </div>
+      </div>
+      <div id="notif-banner" class="notif-banner hidden">
+        🔔 Ative as notificações para receber alertas de novos pedidos.
+        <button class="btn-allow-notif" onclick="requestNotifPermission()">Ativar</button>
+      </div>
+      <div id="empty-orders" class="empty-state hidden">
+        <div class="empty-icon">📭</div><div class="empty-label">Nenhum pedido encontrado.</div>
+      </div>
+      <div class="orders-scroll">
+        <div class="orders-list" id="orders-list"></div>
+      </div>
+
+      <!-- Ranking de Operadores -->
+      <div class="ranking-section" id="ranking-container">
+        <div class="ranking-title">🏆 Ranking de Operadores (hoje)</div>
+        <div class="ranking-list" id="ranking-list"></div>
+      </div>
+    </div>
+
+    <!-- NOVO PEDIDO -->
+    <div class="panel" id="panel-new">
+      <div class="page-header">
+        <div><div class="page-title">Novo Pedido</div><div class="page-subtitle">Registre uma nova solicitação</div></div>
+      </div>
+      <div class="sub-tabs">
+        <button class="sub-tab-btn active" id="stab-form" onclick="switchSubTab('form')">✏️ Registrar Pedido</button>
+        <button class="sub-tab-btn" id="stab-mine" onclick="switchSubTab('mine')">
+          📋 Minhas Solicitações <span class="nav-badge" id="badge-mine">0</span>
+        </button>
+      </div>
+
+      <!-- Form sub -->
+      <div class="sub-panel active" id="sub-form">
+        <div class="form-scroll">
+          <div class="form-wrap">
+            <form id="order-form" onsubmit="submitOrder(event)">
+              <div class="form-section-title">👤 Solicitante</div>
+              <div class="form-row" style="--cols:1">
+                <div class="form-field">
+                  <label class="f-label">Nome do Solicitante</label>
+                  <input class="f-input" id="f-solicitante" type="text" placeholder="Nome completo" required>
+                </div>
+              </div>
+              <div class="form-section-title" style="margin-top:18px">📍 Endereço de Entrega</div>
+              <div class="form-row" style="--cols:2">
+                <div class="form-field"><label class="f-label">Rua</label><input class="f-input" id="f-rua" type="text" placeholder="Nome da rua" required></div>
+                <div class="form-field"><label class="f-label">Prédio</label><input class="f-input" id="f-predio" type="text" placeholder="Número ou nome" required></div>
+              </div>
+              <div class="form-row" style="--cols:2">
+                <div class="form-field"><label class="f-label">Andar</label><input class="f-input" id="f-andar" type="text" placeholder="Ex: 3º" required></div>
+                <div class="form-field"><label class="f-label">Apartamento (AP)</label><input class="f-input" id="f-ap" type="text" placeholder="Ex: 301" required></div>
+              </div>
+              <div class="form-section-title" style="margin-top:18px">📦 Pedido</div>
+              <div class="form-row" style="--cols:1">
+                <div class="form-field"><label class="f-label">Produto / Descrição</label><textarea class="f-input" id="f-produto" placeholder="Descreva o produto ou pedido..." required></textarea></div>
+              </div>
+              <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="clearForm()">Limpar</button>
+                <button type="submit" class="btn-primary">▶ Lançar Pedido</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mine sub -->
+      <div class="sub-panel" id="sub-mine">
+        <div id="empty-mine" class="empty-state hidden">
+          <div class="empty-icon">📭</div><div class="empty-label">Você ainda não fez nenhum pedido.</div>
+        </div>
+        <div class="my-orders-scroll">
+          <div class="my-orders-list" id="my-orders-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CADASTRO -->
+    <div class="panel" id="panel-cadastro">
+      <div class="page-header">
+        <div><div class="page-title">Colaboradores</div><div class="page-subtitle">Gerencie acessos ao sistema</div></div>
+      </div>
+      <div class="collab-layout">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Cadastrar Colaborador</div><div class="card-sub">Defina o perfil de acesso</div></div>
+          <div class="card-body">
+            <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Perfil de Acesso</div>
+            <div class="role-picker" id="role-picker">
+              <div class="role-option selected" data-role="solicitante" onclick="selectRole(this)">
+                <div class="role-icon">✏️</div><div class="role-name">Solicitante</div><div class="role-desc">Cria pedidos</div>
+              </div>
+              <div class="role-option" data-role="operador" onclick="selectRole(this)">
+                <div class="role-icon">📋</div><div class="role-name">Operador</div><div class="role-desc">Visualiza fila</div>
+              </div>
+            </div>
+            <div class="form-field" style="margin-bottom:11px">
+              <label class="f-label">Nome Completo</label>
+              <input class="f-input" id="c-nome" type="text" placeholder="Nome do colaborador">
+            </div>
+            <div class="form-field" style="margin-bottom:11px">
+              <label class="f-label">Usuário (para login)</label>
+              <input class="f-input" id="c-user" type="text" placeholder="Ex: joao.silva" autocomplete="off">
+            </div>
+            <div class="form-field" style="margin-bottom:14px">
+              <label class="f-label">Setor <span style="font-weight:400;color:var(--text3)">(opcional)</span></label>
+              <input class="f-input" id="c-setor" type="text" placeholder="Ex: Financeiro, TI, RH...">
+            </div>
+            <div id="c-error" style="font-size:0.78rem;color:var(--danger);margin-bottom:10px;min-height:16px"></div>
+            <button class="btn-primary" style="width:100%" onclick="cadastrarColaborador()">Cadastrar</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Colaboradores Cadastrados</div><div class="card-sub">Usuários com acesso ao sistema</div></div>
+          <div class="card-body" style="padding:0">
+            <table class="collabs-table">
+              <thead><tr><th>Nome</th><th>Usuário</th><th>Perfil</th><th>Setor</th><th></th></tr></thead>
+              <tbody id="collab-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-area -->
+
+  <div class="statusbar">
+    <span class="sb-item"><span class="sb-dot ok"></span>Normal · &lt;5min</span>
+    <span class="sb-item"><span class="sb-dot warn"></span>Atenção · 5–10min</span>
+    <span class="sb-item"><span class="sb-dot danger"></span>Urgente · &gt;10min</span>
+  </div>
+</div>
+
+<!-- Code Modal -->
+<div class="modal-overlay hidden" id="code-modal">
+  <div class="modal-box">
+    <div class="modal-icon">✅</div>
+    <div class="modal-title">Pedido Lançado!</div>
+    <div class="modal-sub">Seu código de chamado é:</div>
+    <div class="code-display" id="modal-code">—</div>
+    <div class="modal-note">⚠️ Guarde este código. O operador precisará dele para concluir sua entrega.</div>
+    <button class="btn-primary" onclick="closeCodeModal()">Entendido, fechar</button>
+  </div>
+</div>
+
+<!-- Edit collab modal -->
+<div class="modal-overlay hidden" id="edit-modal">
+  <div class="edit-modal-box">
+    <div class="edit-modal-title">✏️ Editar Colaborador</div>
+    <input type="hidden" id="edit-username">
+    <div class="form-field" style="margin-bottom:11px">
+      <label class="f-label">Nome Completo</label>
+      <input class="f-input" id="edit-nome" type="text">
+    </div>
+    <div class="form-field" style="margin-bottom:11px">
+      <label class="f-label">Novo Usuário (login)</label>
+      <input class="f-input" id="edit-user" type="text" autocomplete="off">
+    </div>
+    <div class="form-field" style="margin-bottom:11px">
+      <label class="f-label">Setor <span style="font-weight:400;color:var(--text3)">(opcional)</span></label>
+      <input class="f-input" id="edit-setor" type="text" placeholder="Sem setor = vê todos">
+    </div>
+    <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:8px">Perfil</div>
+    <div class="role-picker" id="edit-role-picker">
+      <div class="role-option" data-role="solicitante" onclick="selectEditRole(this)"><div class="role-icon">✏️</div><div class="role-name">Solicitante</div></div>
+      <div class="role-option" data-role="operador" onclick="selectEditRole(this)"><div class="role-icon">📋</div><div class="role-name">Operador</div></div>
+    </div>
+    <div id="edit-error" style="font-size:0.78rem;color:var(--danger);min-height:16px;margin-bottom:6px"></div>
+    <div class="edit-modal-actions">
+      <button class="btn-secondary" onclick="closeEditModal()">Cancelar</button>
+      <button class="btn-primary" onclick="saveEdit()">Salvar Alterações</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Adiciona a biblioteca do Supabase -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+<script>
+// ══════════════════════════════════════
+//  CONFIGURAÇÃO SUPABASE
+// ══════════════════════════════════════
+const SUPABASE_URL = 'https://bseostcmxyvyirijavqp.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzZW9zdGNteHl2eWlyaWphdnFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5NTI3MjYsImV4cCI6MjA4NzUyODcyNn0.M3gGyE_DpmqgQFylQVPAhvSUqSUmMfzyascOLNCZgh8';
+
+// ══════════════════════════════════════
+//  ESTADO GLOBAL
+// ══════════════════════════════════════
+let supabaseClient = null;
+let me = null;
+let activeTab = '';
+let activeFilter = 'all';
+let activeSubTab = 'form';
+const alerted5 = new Set();
+const alerted10 = new Set();
+let ordersSubscription = null;
+
+// ══════════════════════════════════════
+//  INICIALIZAÇÃO
+// ══════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+  // Inicializa cliente Supabase
+  if (typeof supabase === 'undefined') {
+    console.error('Erro: Biblioteca Supabase não carregada.');
+    document.getElementById('login-error').textContent = 'Erro de conexão com o servidor. Tente novamente.';
+    return;
+  }
+  supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  console.log('Supabase client inicializado');
+
+  // Evento de login
+  document.getElementById('btn-login').addEventListener('click', doLogin);
+  document.getElementById('login-user').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+  // Evento de logout
+  document.getElementById('btn-logout').addEventListener('click', doLogout);
+
+  // Fechar modais ao clicar no overlay
+  document.getElementById('code-modal').addEventListener('click', function (e) { if (e.target === this) closeCodeModal(); });
+  document.getElementById('edit-modal').addEventListener('click', function (e) { if (e.target === this) closeEditModal(); });
+
+  // Iniciar relógio
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  // Loop de alertas
+  setInterval(() => {
+    if (!me) return;
+    checkAlerts();
+  }, 20000);
+});
+
+// ══════════════════════════════════════
+//  FUNÇÕES DE LOGIN
+// ══════════════════════════════════════
+async function doLogin() {
+  console.log('doLogin chamada');
+  const username = document.getElementById('login-user').value.trim();
+  const err = document.getElementById('login-error');
+  if (!username) { err.textContent = 'Informe um usuário.'; return; }
+
+  if (!supabaseClient) {
+    err.textContent = 'Cliente Supabase não inicializado.';
+    return;
+  }
+
+  try {
+    const { data, error } = await supabaseClient
+      .from('users')
+      .select('*')
+      .eq('username', username)
+      .single();
+
+    if (error || !data) {
+      console.error('Erro na consulta:', error);
+      err.textContent = 'Usuário não encontrado.';
+      return;
+    }
+
+    me = data;
+    openApp();
+  } catch (e) {
+    console.error('Exceção no login:', e);
+    err.textContent = 'Erro de rede ou servidor.';
+  }
+}
+
+function openApp() {
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('u-name').textContent = me.nome;
+  document.getElementById('u-role').textContent = roleLabel(me.role);
+  document.getElementById('u-avatar').textContent = me.nome[0].toUpperCase();
+  setupNav();
+  renderCollabs();
+  updateBadges();
+  checkNotifBanner();
+  subscribeOrders();
+  loadOrdersAndRanking();
+}
+
+function doLogout() {
+  me = null;
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-error').textContent = '';
+  alerted5.clear(); alerted10.clear();
+  if (ordersSubscription) ordersSubscription.unsubscribe();
+}
+
+// ══════════════════════════════════════
+//  NAVEGAÇÃO
+// ══════════════════════════════════════
+function setupNav() {
+  ['orders', 'new', 'cadastro'].forEach(t => {
+    document.getElementById('nav-' + t).classList.remove('locked', 'active');
+  });
+  if (me.role === 'adm') { switchTab('orders'); }
+  else if (me.role === 'solicitante') {
+    document.getElementById('nav-orders').classList.add('locked');
+    document.getElementById('nav-cadastro').classList.add('locked');
+    switchTab('new');
+  } else if (me.role === 'operador') {
+    document.getElementById('nav-new').classList.add('locked');
+    document.getElementById('nav-cadastro').classList.add('locked');
+    switchTab('orders');
+  }
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  document.getElementById('nav-' + tab).classList.add('active');
+  if (tab === 'orders') loadOrdersAndRanking();
+  if (tab === 'new') { renderMyOrders(); document.getElementById('f-solicitante').value = me.nome; }
+  if (tab === 'cadastro') renderCollabs();
+}
+
+function switchSubTab(st) {
+  activeSubTab = st;
+  document.querySelectorAll('.sub-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sub-' + st).classList.add('active');
+  document.getElementById('stab-' + st).classList.add('active');
+  if (st === 'mine') renderMyOrders();
+}
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  loadOrdersAndRanking();
+}
+
+// ══════════════════════════════════════
+//  REALTIME
+// ══════════════════════════════════════
+function subscribeOrders() {
+  if (ordersSubscription) return;
+  ordersSubscription = supabaseClient
+    .channel('orders-channel')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => {
+      if (activeTab === 'orders') {
+        loadOrdersAndRanking();
+      }
+      updateBadges();
+      if (payload.eventType === 'INSERT' && !payload.new.done) {
+        soundNewOrder();
+        sendNotif('📋 Novo Pedido #' + payload.new.id, payload.new.produto);
+      }
+    })
+    .subscribe();
+}
+
+// ══════════════════════════════════════
+//  CARREGAR PEDIDOS E RANKING
+// ══════════════════════════════════════
+async function loadOrdersAndRanking() {
+  if (!me) return;
+  let query = supabaseClient.from('orders').select('*');
+  if (me.role === 'solicitante') {
+    query = query.eq('owner', me.username);
+  } else if (me.role === 'operador' && me.setor) {
+    query = query.or(`setor.is.null,setor.eq.${me.setor}`);
+  }
+  const { data, error } = await query
+    .order('done', { ascending: true })
+    .order('created_at', { ascending: true });
+
+  if (error) { console.error(error); return; }
+
+  let filtered = data;
+  if (activeFilter === 'pending') filtered = data.filter(o => !o.done);
+  if (activeFilter === 'done') filtered = data.filter(o => o.done);
+
+  renderOrdersList(filtered);
+  renderRanking();
+}
+
+function renderOrdersList(ordersArray) {
+  const list = document.getElementById('orders-list');
+  const empty = document.getElementById('empty-orders');
+
+  if (!ordersArray.length) {
+    empty.classList.remove('hidden');
+    list.innerHTML = '';
+    return;
+  }
+  empty.classList.add('hidden');
+
+  const isAdm = me.role === 'adm';
+  const now = Date.now();
+
+  list.innerHTML = ordersArray.map(o => {
+    const createdAt = new Date(o.created_at).getTime();
+    const elapsedSec = Math.floor((now - createdAt) / 1000);
+    const st = statusOf(elapsedSec, o.done);
+    const timeStr = new Date(o.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const setorBadge = o.setor ? `<span class="setor-chip">${esc(o.setor)}</span>` : '';
+
+    const completeBlock = !o.done ? `
+      <div class="complete-row">
+        <input class="code-input-small" id="cin-${o.id}" type="text" maxlength="3" placeholder="Cód.">
+        <button type="button" class="btn-complete" onclick="tryComplete(${o.id})">✓ Concluir</button>
+      </div>
+      <div class="code-err" id="cerr-${o.id}"></div>` : '';
+
+    const admBlock = isAdm ? `
+      <div class="adm-actions">
+        ${!o.done ? `<button type="button" class="btn-adm finish" onclick="admComplete(${o.id})">✓ Concluir sem código</button>` : ''}
+        <button type="button" class="btn-adm remove" onclick="admRemove(${o.id})">✕ Remover</button>
+      </div>` : '';
+
+    return `
+    <div class="order-card status-${st}" id="card-${o.id}">
+      <div class="order-id-block"><small>#</small>${o.id}</div>
+      <div class="order-body">
+        <div class="order-product">${esc(o.produto)}</div>
+        <div class="order-addr">
+          <span class="addr-seg"><span class="addr-key">Rua</span>${esc(o.rua)}</span>
+          <span class="addr-seg"><span class="addr-key">Prédio</span>${esc(o.predio)}</span>
+          <span class="addr-seg"><span class="addr-key">Andar</span>${esc(o.andar)}</span>
+          <span class="addr-seg"><span class="addr-key">AP</span>${esc(o.ap)}</span>
+        </div>
+        <div class="order-meta-row">
+          <span class="order-req">↳ ${esc(o.solicitante)}</span>
+          ${setorBadge}
+        </div>
+        ${completeBlock}
+        ${admBlock}
+      </div>
+      <div class="order-side">
+        <span class="order-time">${timeStr}</span>
+        <span class="time-badge ${st === 'done' ? 'done-badge' : st}">${o.done ? '✓ Concluído' : fmtTime(elapsedSec)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function renderRanking() {
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  const { data, error } = await supabaseClient
+    .from('orders')
+    .select('concluded_by')
+    .not('concluded_by', 'is', null)
+    .gte('concluded_at', hoje.toISOString());
+
+  if (error) { console.error(error); return; }
+
+  const countMap = new Map();
+  data.forEach(o => {
+    const op = o.concluded_by;
+    countMap.set(op, (countMap.get(op) || 0) + 1);
+  });
+
+  if (countMap.size === 0) {
+    document.getElementById('ranking-list').innerHTML = '<div class="ranking-item">Nenhuma conclusão hoje</div>';
+    return;
+  }
+
+  const operators = Array.from(countMap.keys());
+  const { data: users, error: userError } = await supabaseClient
+    .from('users')
+    .select('username, nome')
+    .in('username', operators);
+
+  if (userError) { console.error(userError); return; }
+
+  const userMap = Object.fromEntries(users.map(u => [u.username, u.nome]));
+  const sorted = Array.from(countMap.entries()).sort((a, b) => b[1] - a[1]);
+
+  const html = sorted.map(([username, count]) => `
+    <div class="ranking-item">
+      <span>${esc(userMap[username] || username)}</span>
+      <span class="ranking-count">${count}</span>
+    </div>
+  `).join('');
+
+  document.getElementById('ranking-list').innerHTML = html;
+}
+
+// ══════════════════════════════════════
+//  AÇÕES SOBRE PEDIDOS
+// ══════════════════════════════════════
+async function submitOrder(e) {
+  e.preventDefault();
+  const code = String(Math.floor(100 + Math.random() * 900));
+  const setor = me.role === 'solicitante' ? (me.setor || '') : '';
+
+  const newOrder = {
+    code,
+    solicitante: document.getElementById('f-solicitante').value.trim(),
+    rua: document.getElementById('f-rua').value.trim(),
+    predio: document.getElementById('f-predio').value.trim(),
+    andar: document.getElementById('f-andar').value.trim(),
+    ap: document.getElementById('f-ap').value.trim(),
+    produto: document.getElementById('f-produto').value.trim(),
+    owner: me.username,
+    setor,
+    done: false,
+    created_at: new Date().toISOString()
+  };
+
+  const { data, error } = await supabaseClient.from('orders').insert(newOrder).select().single();
+  if (error) {
+    showToast('Erro ao lançar pedido: ' + error.message, 'terror');
+    return;
+  }
+
+  clearForm();
+  document.getElementById('modal-code').textContent = code;
+  document.getElementById('code-modal').classList.remove('hidden');
+  soundNewOrder();
+}
+
+async function tryComplete(id) {
+  const { data: order, error } = await supabaseClient.from('orders').select('*').eq('id', id).single();
+  if (error || !order) return;
+
+  const inp = document.getElementById('cin-' + id);
+  const err = document.getElementById('cerr-' + id);
+  if (inp.value.trim() !== order.code) {
+    err.textContent = '✕ Código incorreto.';
+    inp.style.borderColor = 'var(--danger)';
+    setTimeout(() => { err.textContent = ''; inp.style.borderColor = ''; }, 2500);
+    return;
+  }
+
+  await finishOrder(order);
+}
+
+async function admComplete(id) {
+  const { data: order, error } = await supabaseClient.from('orders').select('*').eq('id', id).single();
+  if (error || !order) return;
+  await finishOrder(order);
+}
+
+async function admRemove(id) {
+  const { error } = await supabaseClient.from('orders').delete().eq('id', id);
+  if (error) { showToast('Erro ao remover', 'terror'); return; }
+  showToast('Pedido #' + id + ' removido.', '');
+}
+
+async function finishOrder(order) {
+  const updates = {
+    done: true,
+    concluded_by: me.username,
+    concluded_at: new Date().toISOString()
+  };
+  const { error } = await supabaseClient.from('orders').update(updates).eq('id', order.id);
+  if (error) { showToast('Erro ao concluir', 'terror'); return; }
+  showToast('✓ Pedido #' + order.id + ' concluído!', 'tsuccess');
+}
+
+function closeCodeModal() {
+  document.getElementById('code-modal').classList.add('hidden');
+  switchSubTab('mine');
+}
+
+function clearForm() {
+  ['f-rua', 'f-predio', 'f-andar', 'f-ap', 'f-produto'].forEach(id => { document.getElementById(id).value = ''; });
+  if (me.role === 'adm') document.getElementById('f-solicitante').value = '';
+}
+
+// ══════════════════════════════════════
+//  MEUS PEDIDOS
+// ══════════════════════════════════════
+async function renderMyOrders() {
+  const { data, error } = await supabaseClient
+    .from('orders')
+    .select('*')
+    .eq('owner', me.username)
+    .order('created_at', { ascending: false });
+
+  if (error) { console.error(error); return; }
+
+  const list = document.getElementById('my-orders-list');
+  const empty = document.getElementById('empty-mine');
+  document.getElementById('badge-mine').textContent = data.filter(o => !o.done).length;
+
+  if (!data.length) { empty.classList.remove('hidden'); list.innerHTML = ''; return; }
+  empty.classList.add('hidden');
+
+  list.innerHTML = data.map(o => {
+    const t = new Date(o.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    return `
+    <div class="my-order-card">
+      <div class="my-order-left">
+        <div class="my-order-product">${esc(o.produto)}</div>
+        <div class="my-order-addr">${esc(o.rua)}, ${esc(o.predio)} — Andar ${esc(o.andar)}, AP ${esc(o.ap)}</div>
+        <div class="my-order-time">Lançado às ${t}</div>
+      </div>
+      <div class="my-order-right">
+        <div class="call-code-box"><div class="call-code-label">Código</div><div class="call-code-val">${o.code}</div></div>
+        <span class="my-order-status ${o.done ? 'concluido' : 'pending'}">${o.done ? '✓ Concluído' : '⏳ Pendente'}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════
+//  COLABORADORES
+// ══════════════════════════════════════
+let selectedRole = 'solicitante';
+let editSelectedRole = 'solicitante';
+
+function selectRole(el) {
+  document.querySelectorAll('#role-picker .role-option').forEach(r => r.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedRole = el.dataset.role;
+}
+
+async function cadastrarColaborador() {
+  const nome = document.getElementById('c-nome').value.trim();
+  const username = document.getElementById('c-user').value.trim().toLowerCase();
+  const setor = document.getElementById('c-setor').value.trim();
+  const role = selectedRole;
+  const errEl = document.getElementById('c-error');
+
+  if (!nome || !username) { errEl.textContent = 'Preencha nome e usuário.'; return; }
+  if (username === '3375') { errEl.textContent = 'Usuário reservado.'; return; }
+
+  const { data: existing } = await supabaseClient.from('users').select('username').eq('username', username).maybeSingle();
+  if (existing) { errEl.textContent = 'Usuário já cadastrado.'; return; }
+
+  const { error } = await supabaseClient.from('users').insert({ nome, username, role, setor });
+  if (error) { errEl.textContent = error.message; return; }
+
+  document.getElementById('c-nome').value = '';
+  document.getElementById('c-user').value = '';
+  document.getElementById('c-setor').value = '';
+  errEl.textContent = '';
+  renderCollabs();
+  showToast(`✓ ${nome} cadastrado como ${roleLabel(role)}`, 'tsuccess');
+}
+
+async function removeCollab(username) {
+  if (username === me.username) { showToast('Não é possível remover o usuário logado.', 'terror'); return; }
+  const { error } = await supabaseClient.from('users').delete().eq('username', username);
+  if (error) { showToast('Erro ao remover', 'terror'); return; }
+  renderCollabs();
+  showToast('Colaborador removido.', '');
+}
+
+async function openEditModal(username) {
+  const { data: c, error } = await supabaseClient.from('users').select('*').eq('username', username).single();
+  if (error || !c) return;
+  document.getElementById('edit-username').value = username;
+  document.getElementById('edit-nome').value = c.nome;
+  document.getElementById('edit-user').value = c.username;
+  document.getElementById('edit-setor').value = c.setor || '';
+  editSelectedRole = c.role;
+  document.querySelectorAll('#edit-role-picker .role-option').forEach(el => {
+    el.classList.toggle('selected', el.dataset.role === c.role);
+  });
+  document.getElementById('edit-error').textContent = '';
+  document.getElementById('edit-modal').classList.remove('hidden');
+}
+
+function selectEditRole(el) {
+  document.querySelectorAll('#edit-role-picker .role-option').forEach(r => r.classList.remove('selected'));
+  el.classList.add('selected');
+  editSelectedRole = el.dataset.role;
+}
+
+function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); }
+
+async function saveEdit() {
+  const oldUsername = document.getElementById('edit-username').value;
+  const nome = document.getElementById('edit-nome').value.trim();
+  const user = document.getElementById('edit-user').value.trim().toLowerCase();
+  const setor = document.getElementById('edit-setor').value.trim();
+  const errEl = document.getElementById('edit-error');
+  if (!nome || !user) { errEl.textContent = 'Preencha nome e usuário.'; return; }
+  if (user === '3375') { errEl.textContent = 'Usuário reservado.'; return; }
+  if (user !== oldUsername) {
+    const { data: existing } = await supabaseClient.from('users').select('username').eq('username', user).maybeSingle();
+    if (existing) { errEl.textContent = 'Usuário já existe.'; return; }
+  }
+  const { error } = await supabaseClient
+    .from('users')
+    .update({ nome, username: user, role: editSelectedRole, setor })
+    .eq('username', oldUsername);
+  if (error) { errEl.textContent = error.message; return; }
+  renderCollabs();
+  closeEditModal();
+  showToast('✓ Colaborador atualizado.', 'tsuccess');
+}
+
+async function renderCollabs() {
+  const { data, error } = await supabaseClient.from('users').select('*').order('nome');
+  if (error) { console.error(error); return; }
+  const tbody = document.getElementById('collab-tbody');
+  tbody.innerHTML = data.map(c => `
+    <tr>
+      <td style="font-weight:500;color:var(--text)">${esc(c.nome)}</td>
+      <td style="font-family:monospace;font-size:0.8rem">${esc(c.username)}</td>
+      <td><span class="role-chip ${c.role}">${roleLabel(c.role)}</span></td>
+      <td style="font-size:0.78rem;color:var(--text3)">${c.setor ? esc(c.setor) : '<span style="opacity:.4">—</span>'}</td>
+      <td>
+        ${c.role !== 'adm' ? `
+        <div class="tbl-actions">
+          <button class="btn-tbl edit" onclick="openEditModal('${c.username}')">Editar</button>
+          <button class="btn-tbl del" onclick="removeCollab('${c.username}')">Remover</button>
+        </div>` : ''}
+      </td>
+    </tr>`).join('');
+}
+
+// ══════════════════════════════════════
+//  UTILITÁRIOS
+// ══════════════════════════════════════
+function roleLabel(r) { return ({ adm: 'Administrador', solicitante: 'Solicitante', operador: 'Operador' })[r] || r; }
+function fmtTime(secs) { const m = Math.floor(secs / 60), s = secs % 60; return m > 0 ? `${m}m ${String(s).padStart(2, '0')}s` : `${s}s`; }
+function statusOf(secs, done) { if (done) return 'done'; if (secs >= 600) return 'danger'; if (secs >= 300) return 'warn'; return 'ok'; }
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+let toastId = 0;
+function showToast(msg, type = '') {
+  const container = document.getElementById('toast-container');
+  const id = ++toastId;
+  const div = document.createElement('div');
+  div.className = 'toast ' + type;
+  div.innerHTML = `<span class="toast-icon">${type === 'tsuccess' ? '✓' : type === 'terror' ? '✕' : type === 'twarn' ? '⚠️' : 'ℹ️'}</span> ${msg}`;
+  div.id = 'toast-' + id;
+  container.appendChild(div);
+  requestAnimationFrame(() => div.classList.add('show'));
+  setTimeout(() => {
+    div.classList.remove('show');
+    setTimeout(() => div.remove(), 400);
+  }, 3500);
+}
+
+function tickClock() {
+  const c = document.getElementById('app-clock');
+  if (c) c.textContent = new Date().toLocaleTimeString('pt-BR');
+}
+
+function requestNotifPermission() {
+  if (!('Notification' in window)) return;
+  Notification.requestPermission().then(p => {
+    if (p === 'granted') {
+      document.getElementById('notif-banner').classList.add('hidden');
+      showToast('✅ Notificações ativadas!', 'tsuccess');
+    }
+  });
+}
+
+function sendNotif(title, body) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  try { new Notification(title, { body, icon: '' }); } catch (e) {}
+}
+
+function checkNotifBanner() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    document.getElementById('notif-banner').classList.remove('hidden');
+  }
+}
+
+async function updateBadges() {
+  if (!me) return;
+  let query = supabaseClient.from('orders').select('*', { count: 'exact', head: false }).eq('done', false);
+  if (me.role === 'solicitante') {
+    query = query.eq('owner', me.username);
+  } else if (me.role === 'operador' && me.setor) {
+    query = query.or(`setor.is.null,setor.eq.${me.setor}`);
+  }
+  const { count } = await query;
+  document.getElementById('badge-orders').textContent = count || 0;
+
+  const { count: mineCount } = await supabaseClient
+    .from('orders')
+    .select('*', { count: 'exact', head: false })
+    .eq('owner', me.username)
+    .eq('done', false);
+  document.getElementById('badge-mine').textContent = mineCount || 0;
+}
+
+// ══════════════════════════════════════
+//  SONS
+// ══════════════════════════════════════
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new AudioCtx();
+  return audioCtx;
+}
+
+function playTone(freq, duration, type = 'sine', volume = 0.4) {
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(volume, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration);
+  } catch (e) {}
+}
+
+function soundNewOrder() {
+  playTone(660, 0.18, 'sine', 0.35);
+  setTimeout(() => playTone(880, 0.22, 'sine', 0.35), 160);
+  setTimeout(() => playTone(1100, 0.28, 'sine', 0.35), 330);
+}
+
+function soundWarn() {
+  playTone(520, 0.15, 'square', 0.2);
+  setTimeout(() => playTone(520, 0.15, 'square', 0.2), 250);
+}
+
+function soundDanger() {
+  playTone(440, 0.12, 'sawtooth', 0.22);
+  setTimeout(() => playTone(440, 0.12, 'sawtooth', 0.22), 200);
+  setTimeout(() => playTone(440, 0.18, 'sawtooth', 0.22), 400);
+}
+
+// ══════════════════════════════════════
+//  ALERTAS
+// ══════════════════════════════════════
+async function checkAlerts() {
+  if (!me) return;
+  let query = supabaseClient.from('orders').select('*').eq('done', false);
+  if (me.role === 'solicitante') {
+    query = query.eq('owner', me.username);
+  } else if (me.role === 'operador' && me.setor) {
+    query = query.or(`setor.is.null,setor.eq.${me.setor}`);
+  }
+  const { data: pending, error } = await query;
+  if (error) return;
+
+  const now = Date.now();
+  let newWarn = [], newDanger = [];
+
+  pending.forEach(o => {
+    const s = Math.floor((now - new Date(o.created_at).getTime()) / 1000);
+    if (s >= 600 && !alerted10.has(o.id)) {
+      alerted10.add(o.id);
+      newDanger.push(o);
+    } else if (s >= 300 && !alerted5.has(o.id)) {
+      alerted5.add(o.id);
+      newWarn.push(o);
+    }
+  });
+
+  if (newDanger.length) {
+    soundDanger();
+    newDanger.forEach(o => {
+      showToast(`🔴 Pedido #${o.id} — URGENTE! Mais de 10 minutos.`, 'terror');
+      sendNotif(`🔴 Pedido Urgente #${o.id}`, `${o.produto} — ${fmtTime(Math.floor((now - new Date(o.created_at).getTime())/1000))} sem atendimento`);
+    });
+  } else if (newWarn.length) {
+    soundWarn();
+    newWarn.forEach(o => {
+      showToast(`🟡 Pedido #${o.id} — Atenção! 5 minutos atingidos.`, 'twarn');
+      sendNotif(`🟡 Pedido em Atenção #${o.id}`, `${o.produto} — ${fmtTime(Math.floor((now - new Date(o.created_at).getTime())/1000))} aguardando`);
+    });
+  }
+}
+</script>
+</body>
+</html>
