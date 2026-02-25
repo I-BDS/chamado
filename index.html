@@ -6,7 +6,7 @@
 <title>Chamados</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230d1f3c'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='%23ffffff' font-family='Arial'%3E📬%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230d1f3c'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='%23ffffff' font-family='Arial'%3E📬%3C/text%3E%3C/svg%3E">
-<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Comanda%22%2C%22short_name%22%3A%22Comanda%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230d1f3c%22%2C%22theme_color%22%3A%22%230d1f3c%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data:image/svg+xml,%253Csvg%2520xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%2520viewBox%3D%270%200%20100%20100%27%253E%253Crect%2520width%3D%27100%27%2520height%3D%27100%27%2520rx%3D%2720%27%2520fill%3D%27%25230d1f3c%27%2F%253E%253Ctext%2520x%3D%2750%27%2520y%3D%2770%27%2520font-size%3D%2760%27%2520text-anchor%3D%27middle%27%2520fill%3D%27%2523ffffff%27%2520font-family%3D%27Arial%27%253E📬%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Chamados%22%2C%22short_name%22%3A%22Chamados%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230d1f3c%22%2C%22theme_color%22%3A%22%230d1f3c%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data:image/svg+xml,%253Csvg%2520xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%2520viewBox%3D%270%200%20100%20100%27%253E%253Crect%2520width%3D%27100%27%2520height%3D%27100%27%2520rx%3D%2720%27%2520fill%3D%27%25230d1f3c%27%2F%253E%253Ctext%2520x%3D%2750%27%2520y%3D%2770%27%2520font-size%3D%2760%27%2520text-anchor%3D%27middle%27%2520fill%3D%27%2523ffffff%27%2520font-family%3D%27Arial%27%253E📬%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -116,10 +116,11 @@ body {
 .addr-key { color: var(--text3); font-size: 0.7rem; }
 .order-meta-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
 .order-req { font-size: 0.75rem; color: var(--text3); }
+.order-req-time { font-size: 0.75rem; font-weight: 600; color: var(--text2); display: flex; align-items: center; gap: 4px; }
 .setor-chip { font-size: 0.68rem; font-weight: 600; background: #eff6ff; color: var(--blue); border-radius: 20px; padding: 1px 7px; }
 
 .order-side { display: flex; flex-direction: column; align-items: flex-end; gap: 7px; flex-shrink: 0; padding-top: 2px; }
-.order-time { font-size: 0.72rem; color: var(--text3); font-variant-numeric: tabular-nums; }
+.order-time { font-size: 0.85rem; font-weight: 700; color: var(--navy); font-variant-numeric: tabular-nums; background: var(--bg2); padding: 2px 6px; border-radius: 4px; margin-bottom: 2px; }
 .time-badge { font-size: 0.73rem; font-weight: 600; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
 .time-badge.ok { background: var(--ok-bg); color: var(--ok); }
 .time-badge.warn { background: var(--warn-bg); color: var(--warn); }
@@ -460,7 +461,7 @@ textarea.f-input { resize: vertical; min-height: 78px; }
     <div class="modal-title">Pedido Lançado!</div>
     <div class="modal-sub">Seu código de chamado é:</div>
     <div class="code-display" id="modal-code">—</div>
-    <div class="modal-note">⚠️ Guarde este código. O operador precisará dele para concluir sua entrega.</div>
+    <div class="modal-note">⚠️ Guarde este código. O operador precisará dele para concluir o chamado.</div>
     <button class="btn-primary" onclick="closeCodeModal()">Entendido, fechar</button>
   </div>
 </div>
@@ -510,6 +511,7 @@ let activeSubTab = 'form';
 const alerted5 = new Set();
 const alerted10 = new Set();
 let ordersSubscription = null;
+let currentLoadedOrders = [];
 
 document.addEventListener('DOMContentLoaded', function() {
   if (typeof supabase === 'undefined') {
@@ -527,10 +529,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   tickClock();
   setInterval(tickClock, 1000);
-  setInterval(() => {
-    if (!me) return;
-    checkAlerts();
-  }, 20000);
+  
+  setInterval(checkTimeAlertsLocal, 10000);
 });
 
 async function doLogin() {
@@ -567,7 +567,10 @@ function doLogout() {
   document.getElementById('login-user').value = '';
   document.getElementById('login-error').textContent = '';
   alerted5.clear(); alerted10.clear();
-  if (ordersSubscription) ordersSubscription.unsubscribe();
+  if (ordersSubscription) {
+    ordersSubscription.unsubscribe();
+    ordersSubscription = null;
+  }
 }
 
 function setupNav() {
@@ -616,11 +619,24 @@ function subscribeOrders() {
   ordersSubscription = supabaseClient
     .channel('orders-channel')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => {
-      if (activeTab === 'orders') { loadOrdersAndRanking(); }
+      const isNew = payload.eventType === 'INSERT';
+      const order = payload.new;
+
+      let isRelevant = false;
+      if (me.role === 'adm') isRelevant = true;
+      else if (me.role === 'solicitante' && order.owner === me.username) isRelevant = true;
+      else if (me.role === 'operador') {
+        if (!me.setor || !order.setor || order.setor === me.setor) isRelevant = true;
+      }
+
+      if (isRelevant && activeTab === 'orders') { loadOrdersAndRanking(); }
+      if (isRelevant && activeTab === 'new' && activeSubTab === 'mine') { renderMyOrders(); }
+      
       updateBadges();
-      if (payload.eventType === 'INSERT' && !payload.new.done) {
+
+      if (isNew && !order.done && isRelevant) {
         soundNewOrder();
-        sendNotif('📋 Novo Pedido #' + payload.new.id, payload.new.produto);
+        sendNotif('📋 Novo Pedido #' + order.id, order.produto);
       }
     }).subscribe();
 }
@@ -632,9 +648,13 @@ async function loadOrdersAndRanking() {
   else if (me.role === 'operador' && me.setor) { query = query.or(`setor.is.null,setor.eq.${me.setor}`); }
   const { data, error } = await query.order('done', { ascending: true }).order('created_at', { ascending: true });
   if (error) return;
+  
+  currentLoadedOrders = data || [];
+  
   let filtered = data;
   if (activeFilter === 'pending') filtered = data.filter(o => !o.done);
   if (activeFilter === 'done') filtered = data.filter(o => o.done);
+  
   renderOrdersList(filtered);
   renderRanking();
 }
@@ -654,7 +674,7 @@ function renderOrdersList(ordersArray) {
     const setorBadge = o.setor ? `<span class="setor-chip">${esc(o.setor)}</span>` : '';
     const completeBlock = !o.done ? `<div class="complete-row"><input class="code-input-small" id="cin-${o.id}" type="text" maxlength="3" placeholder="Cód."><button type="button" class="btn-complete" onclick="tryComplete(${o.id})">✓ Concluir</button></div><div class="code-err" id="cerr-${o.id}"></div>` : '';
     const admBlock = isAdm ? `<div class="adm-actions">${!o.done ? `<button type="button" class="btn-adm finish" onclick="admComplete(${o.id})">✓ Concluir sem código</button>` : ''}<button type="button" class="btn-adm remove" onclick="admRemove(${o.id})">✕ Remover</button></div>` : '';
-    return `<div class="order-card status-${st}" id="card-${o.id}"><div class="order-id-block"><small>#</small>${o.id}</div><div class="order-body"><div class="order-product">${esc(o.produto)}</div><div class="order-addr"><span class="addr-seg"><span class="addr-key">Rua</span>${esc(o.rua)}</span><span class="addr-seg"><span class="addr-key">Prédio</span>${esc(o.predio)}</span><span class="addr-seg"><span class="addr-key">Andar</span>${esc(o.andar)}</span><span class="addr-seg"><span class="addr-key">AP</span>${esc(o.ap)}</span></div><div class="order-meta-row"><span class="order-req">↳ ${esc(o.solicitante)}</span>${setorBadge}</div>${completeBlock}${admBlock}</div><div class="order-side"><span class="order-time">${timeStr}</span><span class="time-badge ${st === 'done' ? 'done-badge' : st}">${o.done ? '✓ Concluído' : fmtTime(elapsedSec)}</span></div></div>`;
+    return `<div class="order-card status-${st}" id="card-${o.id}"><div class="order-id-block"><small>#</small>${o.id}</div><div class="order-body"><div class="order-product">${esc(o.produto)}</div><div class="order-addr"><span class="addr-seg"><span class="addr-key">Rua</span>${esc(o.rua)}</span><span class="addr-seg"><span class="addr-key">Prédio</span>${esc(o.predio)}</span><span class="addr-seg"><span class="addr-key">Andar</span>${esc(o.andar)}</span><span class="addr-seg"><span class="addr-key">AP</span>${esc(o.ap)}</span></div><div class="order-meta-row"><span class="order-req">↳ ${esc(o.solicitante)}</span><span class="order-req-time">🕒 ${timeStr}</span>${setorBadge}</div>${completeBlock}${admBlock}</div><div class="order-side"><span class="order-time">${timeStr}</span><span class="time-badge ${st === 'done' ? 'done-badge' : st}" id="time-badge-${o.id}">${o.done ? '✓ Concluído' : fmtTime(elapsedSec)}</span></div></div>`;
   }).join('');
 }
 
@@ -683,7 +703,6 @@ async function submitOrder(e) {
   clearForm();
   document.getElementById('modal-code').textContent = code;
   document.getElementById('code-modal').classList.remove('hidden');
-  soundNewOrder();
 }
 
 async function tryComplete(id) {
@@ -693,18 +712,6 @@ async function tryComplete(id) {
   const err = document.getElementById('cerr-' + id);
   if (inp.value.trim() !== order.code) { err.textContent = '✕ Código incorreto.'; inp.style.borderColor = 'var(--danger)'; setTimeout(() => { err.textContent = ''; inp.style.borderColor = ''; }, 2500); return; }
   await finishOrder(order);
-}
-
-async function admComplete(id) {
-  const { data: order, error } = await supabaseClient.from('orders').select('*').eq('id', id).single();
-  if (error || !order) return;
-  await finishOrder(order);
-}
-
-async function admRemove(id) {
-  const { error } = await supabaseClient.from('orders').delete().eq('id', id);
-  if (error) { showToast('Erro ao remover', 'terror'); return; }
-  showToast('Pedido #' + id + ' removido.', '');
 }
 
 async function finishOrder(order) {
@@ -726,7 +733,6 @@ async function renderMyOrders() {
   if (error) return;
   const list = document.getElementById('my-orders-list');
   const empty = document.getElementById('empty-mine');
-  document.getElementById('badge-mine').textContent = data.filter(o => !o.done).length;
   if (!data.length) { empty.classList.remove('hidden'); list.innerHTML = ''; return; }
   empty.classList.add('hidden');
   list.innerHTML = data.map(o => {
@@ -828,13 +834,16 @@ function checkNotifBanner() { if (!('Notification' in window)) return; if (Notif
 
 async function updateBadges() {
   if (!me) return;
-  let q1 = supabaseClient.from('orders').select('*', { count: 'exact', head: false }).eq('done', false);
+  let q1 = supabaseClient.from('orders').select('*', { count: 'exact', head: true }).eq('done', false);
   if (me.role === 'solicitante') q1 = q1.eq('owner', me.username);
   else if (me.role === 'operador' && me.setor) q1 = q1.or(`setor.is.null,setor.eq.${me.setor}`);
   const { count: c1 } = await q1;
-  document.getElementById('badge-orders').textContent = c1 || 0;
-  const { count: c2 } = await supabaseClient.from('orders').select('*', { count: 'exact', head: false }).eq('owner', me.username).eq('done', false);
-  document.getElementById('badge-mine').textContent = c2 || 0;
+  const badgeOrders = document.getElementById('badge-orders');
+  if (badgeOrders) badgeOrders.textContent = c1 || 0;
+  
+  const { count: c2 } = await supabaseClient.from('orders').select('*', { count: 'exact', head: true }).eq('owner', me.username).eq('done', false);
+  const badgeMine = document.getElementById('badge-mine');
+  if (badgeMine) badgeMine.textContent = c2 || 0;
 }
 
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -852,19 +861,31 @@ function soundNewOrder() { playTone(660, 0.18, 'sine', 0.35); setTimeout(() => p
 function soundWarn() { playTone(520, 0.15, 'square', 0.2); }
 function soundDanger() { playTone(440, 0.12, 'sawtooth', 0.22); }
 
-async function checkAlerts() {
-  if (!me) return;
-  let query = supabaseClient.from('orders').select('*').eq('done', false);
-  if (me.role === 'solicitante') query = query.eq('owner', me.username);
-  else if (me.role === 'operador' && me.setor) query = query.or(`setor.is.null,setor.eq.${me.setor}`);
-  const { data: pending, error } = await query;
-  if (error) return;
-  const now = Date.now();
-  pending.forEach(o => {
-    const s = Math.floor((now - new Date(o.created_at).getTime()) / 1000);
-    if (s >= 600 && !alerted10.has(o.id)) { alerted10.add(o.id); soundDanger(); showToast(`🔴 Pedido #${o.id} URGENTE!`, 'terror'); }
-    else if (s >= 300 && !alerted5.has(o.id)) { alerted5.add(o.id); soundWarn(); showToast(`🟡 Pedido #${o.id} 5 min atingidos.`, 'twarn'); }
-  });
+function checkTimeAlertsLocal() {
+    if (!me || activeTab !== 'orders') return;
+    const now = Date.now();
+    currentLoadedOrders.forEach(o => {
+        if (o.done) return;
+        const createdAt = new Date(o.created_at).getTime();
+        const elapsedSec = Math.floor((now - createdAt) / 1000);
+        
+        const card = document.getElementById(`card-${o.id}`);
+        const badge = document.getElementById(`time-badge-${o.id}`);
+        
+        if (badge) badge.textContent = fmtTime(elapsedSec);
+        
+        if (elapsedSec >= 600 && !alerted10.has(o.id)) {
+            alerted10.add(o.id);
+            soundDanger();
+            showToast(`🔴 Pedido #${o.id} URGENTE!`, 'terror');
+            if (card) { card.className = 'order-card status-danger'; if(badge) badge.className = 'time-badge danger'; }
+        } else if (elapsedSec >= 300 && !alerted5.has(o.id)) {
+            alerted5.add(o.id);
+            soundWarn();
+            showToast(`🟡 Pedido #${o.id} 5 min atingidos.`, 'twarn');
+            if (card) { card.className = 'order-card status-warn'; if(badge) badge.className = 'time-badge warn'; }
+        }
+    });
 }
 </script>
 </body>
