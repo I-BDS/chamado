@@ -171,6 +171,7 @@ textarea.f-input { resize: vertical; min-height: 78px; }
 .btn-secondary:hover { border-color: var(--text2); color: var(--text); }
 .btn-primary { padding: 10px 26px; background: var(--navy); border: none; border-radius: 7px; font-family: var(--font); font-size: 0.85rem; font-weight: 600; color: #fff; cursor: pointer; transition: background 0.15s; }
 .btn-primary:hover { background: var(--navy-mid); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 
 .my-orders-scroll { flex: 1; overflow-y: auto; padding-right: 4px; }
 .my-orders-scroll::-webkit-scrollbar { width: 5px; }
@@ -188,6 +189,8 @@ textarea.f-input { resize: vertical; min-height: 78px; }
 .my-order-status { font-size: 0.72rem; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
 .my-order-status.pending { background: var(--warn-bg); color: var(--warn); }
 .my-order-status.concluido { background: var(--ok-bg); color: var(--ok); }
+.btn-cancel-order { background: none; border: 1px solid var(--danger); color: var(--danger); font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; cursor: pointer; transition: all 0.15s; font-weight: 600; margin-top: 4px; }
+.btn-cancel-order:hover { background: var(--danger-bg); }
 
 .collab-layout { display: grid; grid-template-columns: 1fr 1.3fr; gap: 24px; align-items: start; }
 .card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
@@ -272,6 +275,10 @@ textarea.f-input { resize: vertical; min-height: 78px; }
   .form-wrap { padding: 16px; }
   .statusbar { gap: 12px; }
   .form-row[style*="--cols:2"] { grid-template-columns: 1fr 1fr !important; }
+  .btn-primary, .btn-secondary { padding: 12px 20px; font-size: 1rem; }
+  .btn-cancel-order { padding: 8px 12px; font-size: 0.8rem; }
+  .code-input-small { padding: 8px; width: 80px; }
+  .btn-complete { padding: 8px 14px; }
 }
 </style>
 </head>
@@ -375,20 +382,20 @@ textarea.f-input { resize: vertical; min-height: 78px; }
               </div>
               <div class="form-section-title" style="margin-top:18px">📍 Endereçamento</div>
               <div class="form-row" style="--cols:2">
-                <div class="form-field"><label class="f-label">Rua</label><input class="f-input" id="f-rua" type="text" placeholder="1" required></div>
-                <div class="form-field"><label class="f-label">Prédio</label><input class="f-input" id="f-predio" type="text" placeholder="1" required></div>
+                <div class="form-field"><label class="f-label">Rua</label><input class="f-input" id="f-rua" type="text" placeholder="Ex: 1" required></div>
+                <div class="form-field"><label class="f-label">Prédio</label><input class="f-input" id="f-predio" type="text" placeholder="Ex: 1" required></div>
               </div>
               <div class="form-row" style="--cols:2">
-                <div class="form-field"><label class="f-label">Andar</label><input class="f-input" id="f-andar" type="text" placeholder="8" required></div>
-                <div class="form-field"><label class="f-label">Picking (AP)</label><input class="f-input" id="f-ap" type="text" placeholder="1" required></div>
+                <div class="form-field"><label class="f-label">Andar</label><input class="f-input" id="f-andar" type="text" placeholder="Ex: 8" required></div>
+                <div class="form-field"><label class="f-label">Picking (AP)</label><input class="f-input" id="f-ap" type="text" placeholder="Ex: 1" required></div>
               </div>
               <div class="form-section-title" style="margin-top:18px">📦 Pedido</div>
               <div class="form-row" style="--cols:1">
-                <div class="form-field"><label class="f-label">Produto / Descrição</label><textarea class="f-input" id="f-produto" placeholder="Insira os 4 últimos números do Código de Barras" required></textarea></div>
+                <div class="form-field"><label class="f-label">Produto / Descrição</label><textarea class="f-input" id="f-produto" placeholder="Insira a descrição do produto ou o EAN." required></textarea></div>
               </div>
               <div class="form-actions">
                 <button type="button" class="btn-secondary" onclick="clearForm()">Limpar</button>
-                <button type="submit" class="btn-primary">▶ Lançar Pedido</button>
+                <button type="submit" class="btn-primary" id="btn-submit-order">▶ Lançar Pedido</button>
               </div>
             </form>
           </div>
@@ -432,7 +439,7 @@ textarea.f-input { resize: vertical; min-height: 78px; }
             </div>
             <div class="form-field" style="margin-bottom:14px">
               <label class="f-label">Setor <span style="font-weight:400;color:var(--text3)">(opcional)</span></label>
-              <input class="f-input" id="c-setor" type="text" placeholder="Ex: Perfumaria, Medicamento ...">
+              <input class="f-input" id="c-setor" type="text" placeholder="Ex: Perfumaria, Medicamento...">
             </div>
             <div id="c-error" style="font-size:0.78rem;color:var(--danger);margin-bottom:10px;min-height:16px"></div>
             <button class="btn-primary" style="width:100%" onclick="cadastrarColaborador()">Cadastrar</button>
@@ -456,9 +463,9 @@ textarea.f-input { resize: vertical; min-height: 78px; }
   </div>
 
   <div class="statusbar">
-    <span class="sb-item"><span class="sb-dot ok"></span>Normal · &lt;5min</span>
-    <span class="sb-item"><span class="sb-dot warn"></span>Atenção · 5–10min</span>
-    <span class="sb-item"><span class="sb-dot danger"></span>Urgente · &gt;10min</span>
+    <span class="sb-item"><span class="sb-dot ok"></span>Normal · &lt;10min</span>
+    <span class="sb-item"><span class="sb-dot warn"></span>Atenção · 10–15min</span>
+    <span class="sb-item"><span class="sb-dot danger"></span>Urgente · &gt;15min</span>
   </div>
 </div>
 
@@ -513,6 +520,18 @@ textarea.f-input { resize: vertical; min-height: 78px; }
   </div>
 </div>
 
+<div class="modal-overlay hidden" id="cancel-order-modal">
+  <div class="delete-modal-box">
+    <div class="modal-icon">🚫</div>
+    <div class="delete-modal-title">Cancelar Pedido</div>
+    <div class="delete-modal-msg">Tem certeza que deseja cancelar seu pedido <strong id="cancel-id-display">#</strong>?<br>O operador não verá mais esta solicitação.</div>
+    <div class="delete-modal-actions">
+      <button class="btn-del-cancel" onclick="closeCancelOrderModal()">Manter Pedido</button>
+      <button class="btn-del-confirm" id="btn-confirm-cancel-order">Sim, Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-container" id="toast-container"></div>
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -531,6 +550,7 @@ const alerted10 = new Set();
 let ordersSubscription = null;
 let currentLoadedOrders = [];
 let pendingDeleteId = null;
+let pendingCancelId = null;
 
 document.addEventListener('DOMContentLoaded', function() {
   if (typeof supabase === 'undefined') {
@@ -546,7 +566,11 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('code-modal').addEventListener('click', function (e) { if (e.target === this) closeCodeModal(); });
   document.getElementById('edit-modal').addEventListener('click', function (e) { if (e.target === this) closeEditModal(); });
   document.getElementById('delete-modal').addEventListener('click', function (e) { if (e.target === this) closeDeleteModal(); });
+  document.getElementById('cancel-order-modal').addEventListener('click', function (e) { if (e.target === this) closeCancelOrderModal(); });
   document.getElementById('btn-confirm-delete').addEventListener('click', confirmDelete);
+  document.getElementById('btn-confirm-cancel-order').addEventListener('click', confirmCancelOrder);
+
+  checkPersistedSession();
 
   tickClock();
   setInterval(tickClock, 1000);
@@ -554,15 +578,34 @@ document.addEventListener('DOMContentLoaded', function() {
   setInterval(checkTimeAlertsLocal, 10000);
 });
 
+function checkPersistedSession() {
+  const session = localStorage.getItem('chamados_session');
+  if (session) {
+    const data = JSON.parse(session);
+    const now = Date.now();
+    const twelveHours = 12 * 60 * 60 * 1000;
+    if (now - data.timestamp < twelveHours) {
+      me = data.user;
+      openApp();
+    } else {
+      localStorage.removeItem('chamados_session');
+    }
+  }
+}
+
 async function doLogin() {
   const username = document.getElementById('login-user').value.trim();
   const err = document.getElementById('login-error');
   if (!username) { err.textContent = 'Informe um usuário.'; return; }
   if (!supabaseClient) { err.textContent = 'Cliente Supabase não inicializado.'; return; }
   try {
-    const { data, error } = await supabaseClient.from('users').select('*').eq('username', username).single();
+    const { data, error } = await supabaseClient.from('users').select('id, username, nome, role, setor').eq('username', username).single();
     if (error || !data) { err.textContent = 'Usuário não encontrado.'; return; }
     me = data;
+    localStorage.setItem('chamados_session', JSON.stringify({
+      user: me,
+      timestamp: Date.now()
+    }));
     openApp();
   } catch (e) { err.textContent = 'Erro de rede ou servidor.'; }
 }
@@ -583,6 +626,7 @@ function openApp() {
 
 function doLogout() {
   me = null;
+  localStorage.removeItem('chamados_session');
   document.getElementById('login-screen').classList.remove('hidden');
   document.getElementById('app').classList.add('hidden');
   document.getElementById('login-user').value = '';
@@ -664,7 +708,7 @@ function subscribeOrders() {
 
 async function loadOrdersAndRanking() {
   if (!me) return;
-  let query = supabaseClient.from('orders').select('*');
+  let query = supabaseClient.from('orders').select('id, created_at, done, produto, rua, predio, andar, ap, solicitante, setor, code');
   if (me.role === 'solicitante') { query = query.eq('owner', me.username); }
   else if (me.role === 'operador') {
     if (me.setor) { query = query.or(`setor.is.null,setor.eq."",setor.eq.${me.setor}`); }
@@ -716,20 +760,33 @@ async function renderRanking() {
   document.getElementById('ranking-list').innerHTML = sorted.map(([username, count]) => `<div class="ranking-item"><span>${esc(userMap[username] || username)}</span><span class="ranking-count">${count}</span></div>`).join('');
 }
 
+let submitCooldown = false;
 async function submitOrder(e) {
   e.preventDefault();
+  if (submitCooldown) {
+    showToast('Aguarde 5 segundos para lançar outro pedido.', 'twarn');
+    return;
+  }
   const code = String(Math.floor(100 + Math.random() * 900));
   const setor = me.setor || '';
   const newOrder = { code, solicitante: document.getElementById('f-solicitante').value.trim(), rua: document.getElementById('f-rua').value.trim(), predio: document.getElementById('f-predio').value.trim(), andar: document.getElementById('f-andar').value.trim(), ap: document.getElementById('f-ap').value.trim(), produto: document.getElementById('f-produto').value.trim(), owner: me.username, setor, done: false, created_at: new Date().toISOString() };
-  const { error } = await supabaseClient.from('orders').insert(newOrder).select().single();
+  const { error } = await supabaseClient.from('orders').insert(newOrder).select('id').single();
   if (error) { showToast('Erro ao lançar pedido: ' + error.message, 'terror'); return; }
   clearForm();
   document.getElementById('modal-code').textContent = code;
   document.getElementById('code-modal').classList.remove('hidden');
+  
+  submitCooldown = true;
+  const btn = document.getElementById('btn-submit-order');
+  btn.disabled = true;
+  setTimeout(() => {
+    submitCooldown = false;
+    btn.disabled = false;
+  }, 5000);
 }
 
 async function tryComplete(id) {
-  const { data: order, error } = await supabaseClient.from('orders').select('*').eq('id', id).single();
+  const { data: order, error } = await supabaseClient.from('orders').select('id, code').eq('id', id).single();
   if (error || !order) return;
   const inp = document.getElementById('cin-' + id);
   const err = document.getElementById('cerr-' + id);
@@ -745,7 +802,7 @@ async function finishOrder(order) {
 }
 
 async function admComplete(id) {
-  const { data: order, error } = await supabaseClient.from('orders').select('*').eq('id', id).single();
+  const { data: order, error } = await supabaseClient.from('orders').select('id').eq('id', id).single();
   if (error || !order) return;
   await finishOrder(order);
 }
@@ -773,6 +830,30 @@ async function confirmDelete() {
   closeDeleteModal();
 }
 
+function cancelMyOrder(id) {
+  pendingCancelId = id;
+  document.getElementById('cancel-id-display').textContent = '#' + id;
+  document.getElementById('cancel-order-modal').classList.remove('hidden');
+}
+
+function closeCancelOrderModal() {
+  document.getElementById('cancel-order-modal').classList.add('hidden');
+  pendingCancelId = null;
+}
+
+async function confirmCancelOrder() {
+  if (!pendingCancelId) return;
+  const { error } = await supabaseClient.from('orders').delete().eq('id', pendingCancelId).eq('owner', me.username);
+  if (error) {
+    showToast('Erro ao cancelar pedido: ' + error.message, 'terror');
+  } else {
+    showToast('Pedido cancelado.', 'tsuccess');
+    renderMyOrders();
+    loadOrdersAndRanking();
+  }
+  closeCancelOrderModal();
+}
+
 function closeCodeModal() { document.getElementById('code-modal').classList.add('hidden'); switchSubTab('mine'); }
 
 function clearForm() {
@@ -781,7 +862,7 @@ function clearForm() {
 }
 
 async function renderMyOrders() {
-  const { data, error } = await supabaseClient.from('orders').select('*').eq('owner', me.username).order('created_at', { ascending: false });
+  const { data, error } = await supabaseClient.from('orders').select('id, created_at, done, produto, rua, predio, andar, ap, code').eq('owner', me.username).order('created_at', { ascending: false });
   if (error) return;
   const list = document.getElementById('my-orders-list');
   const empty = document.getElementById('empty-mine');
@@ -789,7 +870,8 @@ async function renderMyOrders() {
   empty.classList.add('hidden');
   list.innerHTML = data.map(o => {
     const t = new Date(o.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    return `<div class="my-order-card"><div class="my-order-left"><div class="my-order-product">${esc(o.produto)}</div><div class="my-order-addr">${esc(o.rua)}, ${esc(o.predio)} — Andar ${esc(o.andar)}, AP ${esc(o.ap)}</div><div class="my-order-time">Lançado às ${t}</div></div><div class="my-order-right"><div class="call-code-box"><div class="call-code-label">Código</div><div class="call-code-val">${o.code}</div></div><span class="my-order-status ${o.done ? 'concluido' : 'pending'}">${o.done ? '✓ Concluído' : '⏳ Pendente'}</span></div></div>`;
+    const cancelBtn = !o.done ? `<button class="btn-cancel-order" onclick="cancelMyOrder(${o.id})">Cancelar</button>` : '';
+    return `<div class="my-order-card"><div class="my-order-left"><div class="my-order-product">${esc(o.produto)}</div><div class="my-order-addr">${esc(o.rua)}, ${esc(o.predio)} — Andar ${esc(o.andar)}, AP ${esc(o.ap)}</div><div class="my-order-time">Lançado às ${t}</div>${cancelBtn}</div><div class="my-order-right"><div class="call-code-box"><div class="call-code-label">Código</div><div class="call-code-val">${o.code}</div></div><span class="my-order-status ${o.done ? 'concluido' : 'pending'}">${o.done ? '✓ Concluído' : '⏳ Pendente'}</span></div></div>`;
   }).join('');
 }
 
@@ -824,7 +906,7 @@ async function removeCollab(username) {
 }
 
 async function openEditModal(username) {
-  const { data: c, error } = await supabaseClient.from('users').select('*').eq('username', username).single();
+  const { data: c, error } = await supabaseClient.from('users').select('nome, username, role, setor').eq('username', username).single();
   if (error || !c) return;
   document.getElementById('edit-username').value = username;
   document.getElementById('edit-nome').value = c.nome;
@@ -853,14 +935,14 @@ async function saveEdit() {
 }
 
 async function renderCollabs() {
-  const { data, error } = await supabaseClient.from('users').select('*').order('nome');
+  const { data, error } = await supabaseClient.from('users').select('nome, username, role, setor').order('nome');
   if (error) return;
   document.getElementById('collab-tbody').innerHTML = data.map(c => `<tr><td style="font-weight:500;color:var(--text)">${esc(c.nome)}</td><td style="font-family:monospace;font-size:0.8rem">${esc(c.username)}</td><td><span class="role-chip ${c.role}">${roleLabel(c.role)}</span></td><td style="font-size:0.78rem;color:var(--text3)">${c.setor ? esc(c.setor) : '<span style="opacity:.4">—</span>'}</td><td>${c.role !== 'adm' ? `<div class="tbl-actions"><button class="btn-tbl edit" onclick="openEditModal('${c.username}')">Editar</button><button class="btn-tbl del" onclick="removeCollab('${c.username}')">Remover</button></div>` : ''}</td></tr>`).join('');
 }
 
 function roleLabel(r) { return ({ adm: 'Administrador', solicitante: 'Solicitante', operador: 'Operador' })[r] || r; }
 function fmtTime(secs) { const m = Math.floor(secs / 60), s = secs % 60; return m > 0 ? `${m}m ${String(s).padStart(2, '0')}s` : `${s}s`; }
-function statusOf(secs, done) { if (done) return 'done'; if (secs >= 600) return 'danger'; if (secs >= 300) return 'warn'; return 'ok'; }
+function statusOf(secs, done) { if (done) return 'done'; if (secs >= 900) return 'danger'; if (secs >= 600) return 'warn'; return 'ok'; }
 function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
 let toastId = 0;
@@ -889,14 +971,14 @@ function checkNotifBanner() { if (!('Notification' in window)) return; if (Notif
 
 async function updateBadges() {
   if (!me) return;
-  let q1 = supabaseClient.from('orders').select('*', { count: 'exact', head: true }).eq('done', false);
+  let q1 = supabaseClient.from('orders').select('id', { count: 'exact', head: true }).eq('done', false);
   if (me.role === 'solicitante') q1 = q1.eq('owner', me.username);
   else if (me.role === 'operador' && me.setor) q1 = q1.or(`setor.is.null,setor.eq."",setor.eq.${me.setor}`);
   const { count: c1 } = await q1;
   const badgeOrders = document.getElementById('badge-orders');
   if (badgeOrders) badgeOrders.textContent = c1 || 0;
   
-  const { count: c2 } = await supabaseClient.from('orders').select('*', { count: 'exact', head: true }).eq('owner', me.username).eq('done', false);
+  const { count: c2 } = await supabaseClient.from('orders').select('id', { count: 'exact', head: true }).eq('owner', me.username).eq('done', false);
   const badgeMine = document.getElementById('badge-mine');
   if (badgeMine) badgeMine.textContent = c2 || 0;
 }
@@ -929,15 +1011,15 @@ function checkTimeAlertsLocal() {
         
         if (badge) badge.textContent = fmtTime(elapsedSec);
         
-        if (elapsedSec >= 600 && !alerted10.has(o.id)) {
+        if (elapsedSec >= 900 && !alerted10.has(o.id)) {
             alerted10.add(o.id);
             soundDanger();
             showToast(`🔴 Pedido #${o.id} URGENTE!`, 'terror');
             if (card) { card.className = 'order-card status-danger'; if(badge) badge.className = 'time-badge danger'; }
-        } else if (elapsedSec >= 300 && !alerted5.has(o.id)) {
+        } else if (elapsedSec >= 600 && !alerted5.has(o.id)) {
             alerted5.add(o.id);
             soundWarn();
-            showToast(`🟡 Pedido #${o.id} 5 min atingidos.`, 'twarn');
+            showToast(`🟡 Pedido #${o.id} 10 min atingidos.`, 'twarn');
             if (card) { card.className = 'order-card status-warn'; if(badge) badge.className = 'time-badge warn'; }
         }
     });
