@@ -647,7 +647,7 @@ function subscribeOrders() {
       if (me.role === 'adm') isRelevant = true;
       else if (me.role === 'solicitante' && order.owner === me.username) isRelevant = true;
       else if (me.role === 'operador') {
-        if (!me.setor || !order.setor || order.setor === me.setor) isRelevant = true;
+        if (!order.setor || order.setor === "" || !me.setor || order.setor === me.setor) isRelevant = true;
       }
 
       if (isRelevant && activeTab === 'orders') { loadOrdersAndRanking(); }
@@ -667,7 +667,7 @@ async function loadOrdersAndRanking() {
   let query = supabaseClient.from('orders').select('*');
   if (me.role === 'solicitante') { query = query.eq('owner', me.username); }
   else if (me.role === 'operador') {
-    if (me.setor) { query = query.or(`setor.is.null,setor.eq.${me.setor}`); }
+    if (me.setor) { query = query.or(`setor.is.null,setor.eq."",setor.eq.${me.setor}`); }
   }
   const { data, error } = await query.order('done', { ascending: true }).order('created_at', { ascending: true });
   if (error) return;
@@ -891,7 +891,7 @@ async function updateBadges() {
   if (!me) return;
   let q1 = supabaseClient.from('orders').select('*', { count: 'exact', head: true }).eq('done', false);
   if (me.role === 'solicitante') q1 = q1.eq('owner', me.username);
-  else if (me.role === 'operador' && me.setor) q1 = q1.or(`setor.is.null,setor.eq.${me.setor}`);
+  else if (me.role === 'operador' && me.setor) q1 = q1.or(`setor.is.null,setor.eq."",setor.eq.${me.setor}`);
   const { count: c1 } = await q1;
   const badgeOrders = document.getElementById('badge-orders');
   if (badgeOrders) badgeOrders.textContent = c1 || 0;
