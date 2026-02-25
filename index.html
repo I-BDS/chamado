@@ -232,6 +232,13 @@ textarea.f-input { resize: vertical; min-height: 78px; }
 .edit-modal-title { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 18px; }
 .edit-modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
 
+.delete-modal-box { background: var(--white); border-radius: 14px; padding: 32px; width: 100%; max-width: 380px; box-shadow: var(--shadow-lg); text-align: center; border-top: 5px solid var(--danger); }
+.delete-modal-title { font-size: 1.15rem; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+.delete-modal-msg { font-size: 0.9rem; color: var(--text2); margin-bottom: 24px; line-height: 1.4; }
+.delete-modal-actions { display: flex; gap: 12px; }
+.btn-del-confirm { flex: 1; padding: 12px; background: var(--danger); color: #fff; border: none; border-radius: 8px; font-family: var(--font); font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+.btn-del-cancel { flex: 1; padding: 12px; background: var(--bg2); color: var(--text2); border: none; border-radius: 8px; font-family: var(--font); font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+
 .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
 .toast { background: var(--navy); color: #fff; font-size: 0.84rem; font-weight: 500; padding: 11px 18px; border-radius: 8px; box-shadow: var(--shadow-lg); pointer-events: none; transform: translateX(110%); opacity: 0; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); max-width: 320px; display: flex; align-items: center; gap: 8px; }
 .toast.show { transform: translateX(0); opacity: 1; }
@@ -495,6 +502,17 @@ textarea.f-input { resize: vertical; min-height: 78px; }
   </div>
 </div>
 
+<div class="modal-overlay hidden" id="delete-modal">
+  <div class="delete-modal-box">
+    <div class="delete-modal-title">⚠️ Excluir Pedido</div>
+    <div class="delete-modal-msg">Você tem certeza que deseja remover permanentemente o pedido <strong id="del-id-display">#</strong>?<br>Esta ação não pode ser desfeita.</div>
+    <div class="delete-modal-actions">
+      <button class="btn-del-cancel" onclick="closeDeleteModal()">Cancelar</button>
+      <button class="btn-del-confirm" id="btn-confirm-delete">Sim, Excluir</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-container" id="toast-container"></div>
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -512,6 +530,7 @@ const alerted5 = new Set();
 const alerted10 = new Set();
 let ordersSubscription = null;
 let currentLoadedOrders = [];
+let pendingDeleteId = null;
 
 document.addEventListener('DOMContentLoaded', function() {
   if (typeof supabase === 'undefined') {
@@ -526,6 +545,8 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('btn-logout').addEventListener('click', doLogout);
   document.getElementById('code-modal').addEventListener('click', function (e) { if (e.target === this) closeCodeModal(); });
   document.getElementById('edit-modal').addEventListener('click', function (e) { if (e.target === this) closeEditModal(); });
+  document.getElementById('delete-modal').addEventListener('click', function (e) { if (e.target === this) closeDeleteModal(); });
+  document.getElementById('btn-confirm-delete').addEventListener('click', confirmDelete);
 
   tickClock();
   setInterval(tickClock, 1000);
@@ -645,7 +666,9 @@ async function loadOrdersAndRanking() {
   if (!me) return;
   let query = supabaseClient.from('orders').select('*');
   if (me.role === 'solicitante') { query = query.eq('owner', me.username); }
-  else if (me.role === 'operador' && me.setor) { query = query.or(`setor.is.null,setor.eq.${me.setor}`); }
+  else if (me.role === 'operador') {
+    if (me.setor) { query = query.or(`setor.is.null,setor.eq.${me.setor}`); }
+  }
   const { data, error } = await query.order('done', { ascending: true }).order('created_at', { ascending: true });
   if (error) return;
   
@@ -696,7 +719,7 @@ async function renderRanking() {
 async function submitOrder(e) {
   e.preventDefault();
   const code = String(Math.floor(100 + Math.random() * 900));
-  const setor = me.role === 'solicitante' ? (me.setor || '') : '';
+  const setor = me.setor || '';
   const newOrder = { code, solicitante: document.getElementById('f-solicitante').value.trim(), rua: document.getElementById('f-rua').value.trim(), predio: document.getElementById('f-predio').value.trim(), andar: document.getElementById('f-andar').value.trim(), ap: document.getElementById('f-ap').value.trim(), produto: document.getElementById('f-produto').value.trim(), owner: me.username, setor, done: false, created_at: new Date().toISOString() };
   const { error } = await supabaseClient.from('orders').insert(newOrder).select().single();
   if (error) { showToast('Erro ao lançar pedido: ' + error.message, 'terror'); return; }
@@ -719,6 +742,35 @@ async function finishOrder(order) {
   const { error } = await supabaseClient.from('orders').update(updates).eq('id', order.id);
   if (error) { showToast('Erro ao concluir', 'terror'); return; }
   showToast('✓ Pedido #' + order.id + ' concluído!', 'tsuccess');
+}
+
+async function admComplete(id) {
+  const { data: order, error } = await supabaseClient.from('orders').select('*').eq('id', id).single();
+  if (error || !order) return;
+  await finishOrder(order);
+}
+
+function admRemove(id) {
+  pendingDeleteId = id;
+  document.getElementById('del-id-display').textContent = '#' + id;
+  document.getElementById('delete-modal').classList.remove('hidden');
+}
+
+function closeDeleteModal() {
+  document.getElementById('delete-modal').classList.add('hidden');
+  pendingDeleteId = null;
+}
+
+async function confirmDelete() {
+  if (!pendingDeleteId) return;
+  const { error } = await supabaseClient.from('orders').delete().eq('id', pendingDeleteId);
+  if (error) {
+    showToast('Erro ao remover pedido: ' + error.message, 'terror');
+  } else {
+    showToast(`Pedido #${pendingDeleteId} removido com sucesso.`, '');
+    loadOrdersAndRanking();
+  }
+  closeDeleteModal();
 }
 
 function closeCodeModal() { document.getElementById('code-modal').classList.add('hidden'); switchSubTab('mine'); }
@@ -763,6 +815,9 @@ async function cadastrarColaborador() {
 
 async function removeCollab(username) {
   if (username === me.username) { showToast('Não é possível remover o usuário logado.', 'terror'); return; }
+  const confirmacao = confirm(`Tem certeza que deseja remover o colaborador "${username}"?`);
+  if (!confirmacao) return;
+
   const { error } = await supabaseClient.from('users').delete().eq('username', username);
   if (error) { showToast('Erro ao remover', 'terror'); return; }
   renderCollabs(); showToast('Colaborador removido.', '');
